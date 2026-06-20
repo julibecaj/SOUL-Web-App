@@ -2,20 +2,9 @@ import Link from "next/link";
 import { Brand } from "./components/Brand";
 import { Icon } from "./components/Icon";
 import { Player } from "./components/Player";
-
-const albums = [
-  { title: "Afterglow", artist: "Mira Vale", tone: "album-violet", number: "01" },
-  { title: "Velvet Static", artist: "Saint June", tone: "album-cyan", number: "02" },
-  { title: "Soft Collision", artist: "Lena Noir", tone: "album-gold", number: "03" },
-  { title: "Blue Hour", artist: "Lowlight", tone: "album-blue", number: "04" },
-];
-
-const tracks = [
-  { title: "Electric Heart", artist: "Mira Vale", time: "3:42", active: true },
-  { title: "Slow Motion", artist: "Saint June", time: "4:08" },
-  { title: "Everything We Never Said", artist: "Lena Noir", time: "3:19" },
-  { title: "Midnight Cinema", artist: "Lowlight", time: "4:31" },
-];
+import { BackendTrackTable } from "./components/TrackList";
+import { HomeAlbumGrid } from "./components/CatalogViews";
+import { LiveTrackArt } from "./components/LiveTrackArt";
 
 const features = [
   {
@@ -91,20 +80,14 @@ export default function Home() {
         <div className="hero-visual reveal reveal-delay-2">
           <div className="vinyl-orbit">
             <div className="vinyl">
-              <div className="vinyl-label">
-                <Brand compact />
-                <span>AFTERGLOW</span>
-              </div>
+              <LiveTrackArt variant="vinyl" />
             </div>
           </div>
           <div className="hero-card">
             <div className="hero-card-art album-violet">
               <span className="art-noise" />
               <span className="art-orb" />
-              <div className="relative z-10">
-                <p>SOUL EXCLUSIVE</p>
-                <h2>AFTER<br />GLOW</h2>
-              </div>
+              <LiveTrackArt variant="hero" />
             </div>
             <Player compact />
           </div>
@@ -128,24 +111,7 @@ export default function Home() {
             Explore all <Icon name="arrow" className="h-4 w-4" />
           </a>
         </div>
-        <div className="album-grid">
-          {albums.map((album, index) => (
-            <article
-              className={`album-card reveal reveal-delay-${Math.min(index + 1, 3)}`}
-              key={album.title}
-            >
-              <div className={`album-art ${album.tone}`}>
-                <span className="art-noise" />
-                <span className="album-number">{album.number}</span>
-                <button className="album-play" aria-label={`Play ${album.title}`}>
-                  <Icon name="play" className="h-5 w-5" />
-                </button>
-              </div>
-              <h3>{album.title}</h3>
-              <p>{album.artist}</p>
-            </article>
-          ))}
-        </div>
+        <HomeAlbumGrid />
       </section>
 
       <section id="experience" className="section page-wrap">
@@ -166,10 +132,7 @@ export default function Home() {
           <div className="player-stage">
             <div className="player-cover album-cyan">
               <span className="art-noise" />
-              <div>
-                <span>SAINT JUNE</span>
-                <strong>VELVET<br />STATIC</strong>
-              </div>
+              <LiveTrackArt variant="stage" />
             </div>
             <Player />
           </div>
@@ -184,19 +147,8 @@ export default function Home() {
           </div>
           <span className="hidden text-sm text-white/35 sm:block">Updated 8 minutes ago</span>
         </div>
-        <div className="track-list reveal reveal-delay-1">
-          {tracks.map((track, index) => (
-            <div className={`track-row ${track.active ? "is-active" : ""}`} key={track.title}>
-              <span className="track-index">{track.active ? <Icon name="wave" className="h-4 w-4" /> : `0${index + 1}`}</span>
-              <button className="track-play" aria-label={`Play ${track.title}`}>
-                <Icon name="play" className="h-3.5 w-3.5" />
-              </button>
-              <div className="track-title"><strong>{track.title}</strong><span>{track.artist}</span></div>
-              <span className="track-type">Track</span>
-              <button className="heart-button" aria-label={`Favorite ${track.title}`}><Icon name="heart" className="h-4 w-4" /></button>
-              <span className="track-time">{track.time}</span>
-            </div>
-          ))}
+        <div className="reveal reveal-delay-1">
+          <BackendTrackTable limit={4} variant="home" />
         </div>
       </section>
 

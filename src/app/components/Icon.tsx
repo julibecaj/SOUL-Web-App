@@ -14,7 +14,11 @@ type IconName =
   | "upload"
   | "search"
   | "clock"
-  | "plus";
+  | "plus"
+  | "pause"
+  | "previous"
+  | "next"
+  | "trash";
 
 export function Icon({ name, className = "" }: { name: string; className?: string }) {
   const props = {
@@ -45,6 +49,10 @@ export function Icon({ name, className = "" }: { name: string; className?: strin
     search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></>,
     clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
     plus: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
+    pause: <><path d="M9 7v10" /><path d="M15 7v10" /></>,
+    previous: <><path d="M6 6v12" /><path d="m18 7-8 5 8 5V7Z" fill="currentColor" stroke="none" /></>,
+    next: <><path d="M18 6v12" /><path d="m6 7 8 5-8 5V7Z" fill="currentColor" stroke="none" /></>,
+    trash: <><path d="M4 7h16" /><path d="M9 7V4h6v3" /><path d="m6 7 1 13h10l1-13" /></>,
   };
 
   return <svg {...props}>{paths[name as IconName] ?? paths.spark}</svg>;

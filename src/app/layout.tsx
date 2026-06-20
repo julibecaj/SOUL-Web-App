@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TrackPlayerProvider } from "./components/TrackPlayerProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <TrackPlayerProvider>{children}</TrackPlayerProvider>
+      </body>
     </html>
   );
 }

@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Uploads" };
 
 const releases = [
   { title: "Paper Moons", type: "Single", date: "June 12, 2026", status: "Live", tone: "tone-violet" },
-  { title: "City in Reverse", type: "Demo", date: "June 8, 2026", status: "Private", tone: "tone-cyan" },
+  { title: "City in Reverse", type: "Draft", date: "June 8, 2026", status: "Private", tone: "tone-cyan" },
   { title: "Still Warm", type: "Single", date: "May 24, 2026", status: "Live", tone: "tone-gold" },
 ];
 
@@ -19,19 +19,18 @@ export default function UploadsPage() {
         <GlassCard className="upload-dropzone">
           <span className="upload-icon"><Icon name="upload" className="h-7 w-7" /></span>
           <h2>Bring your next sound into SOUL.</h2>
-          <p>Audio, artwork, and release details can begin here.</p>
-          <button className="button-primary"><Icon name="plus" className="h-4 w-4" /> Choose audio</button>
+          <p>Start with high-quality audio and artwork that feels like the record.</p>
+          <button className="button-primary" type="button"><Icon name="plus" className="h-4 w-4" /> Choose audio</button>
           <small>WAV, FLAC, or MP3 · up to 500 MB</small>
         </GlassCard>
-        <GlassCard className="upload-insights">
-          <p className="eyebrow">This month</p>
-          <strong>18.4K</strong>
-          <span>total listens</span>
-          <div className="mini-bars">
-            {[35, 52, 44, 68, 61, 82, 72, 94, 78, 100].map((height, index) => (
-              <i style={{ height: `${height}%` }} key={index} />
-            ))}
+        <GlassCard className="release-form-card">
+          <p className="eyebrow">Release details</p>
+          <label><span>Track title</span><div>Midnight Signal</div></label>
+          <label><span>Album</span><div>Neon Letters</div></label>
+          <div className="release-moods">
+            <span>Night Drive</span><span>Electronic</span><span>Dreamy</span>
           </div>
+          <button className="button-primary publish-button" type="button">Publish to SOUL <Icon name="arrow" className="h-4 w-4" /></button>
         </GlassCard>
       </div>
       <div className="app-section">
