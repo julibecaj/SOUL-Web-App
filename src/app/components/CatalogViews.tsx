@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
   addTrackToPlaylist,
@@ -297,6 +298,7 @@ export function ArtistsCatalog() {
 }
 
 export function PlaylistsCatalog() {
+  const router = useRouter();
   const { tracks } = useTrackPlayer();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
@@ -333,20 +335,36 @@ export function PlaylistsCatalog() {
     setSaving(true);
 
     try {
-      const playlist = await createPlaylist({
-        name: cleanName,
-        description: description.trim(),
-      });
+      const token = window.localStorage
+        .getItem("soul_token")
+        ?.trim()
+        .replace(/^Bearer\s+/i, "");
+
+      if (!token) {
+        console.error("Playlist creation blocked: soul_token is missing.");
+        router.replace("/login");
+        router.refresh();
+        return;
+      }
+
+      const playlist = await createPlaylist(
+        {
+          name: cleanName,
+          description: description.trim(),
+        },
+        token,
+      );
 
       if (startingTrack) {
-        await addTrackToPlaylist(playlist.id, Number(startingTrack));
+        await addTrackToPlaylist(playlist.id, Number(startingTrack), token);
       }
 
       setName("");
       setDescription("");
       setStartingTrack("");
       await loadPlaylists();
-    } catch {
+    } catch (caughtError) {
+      console.error("Playlist creation failed:", caughtError);
       setError("Your playlist could not be saved. Please try again.");
     } finally {
       setSaving(false);

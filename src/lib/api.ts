@@ -206,8 +206,20 @@ export function saveAuthSession(auth: AuthResponse) {
   window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(auth.user));
 }
 
+export function getStoredToken(): string | null {
+  if (typeof window === "undefined") return null;
+
+  const token = window.localStorage
+    .getItem(AUTH_TOKEN_KEY)
+    ?.trim()
+    .replace(/^Bearer\s+/i, "");
+
+  return token || null;
+}
+
 function authorizationHeaders(token?: string): HeadersInit {
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  const cleanToken = token?.trim().replace(/^Bearer\s+/i, "") || getStoredToken();
+  return cleanToken ? { Authorization: `Bearer ${cleanToken}` } : {};
 }
 
 async function requestJson(path: string, init?: RequestInit) {
@@ -221,7 +233,16 @@ async function requestJson(path: string, init?: RequestInit) {
   });
 
   if (!response.ok) {
-    throw new Error(`SOUL request failed (${response.status})`);
+    const responseBody = await response.text();
+    console.error("SOUL API request failed", {
+      path,
+      status: response.status,
+      statusText: response.statusText,
+      responseBody,
+    });
+    throw new Error(
+      `SOUL request failed (${response.status} ${response.statusText})${responseBody ? `: ${responseBody}` : ""}`,
+    );
   }
 
   if (response.status === 204) return null;
@@ -290,15 +311,21 @@ export async function getPlaylistTracks(id: number | string, token?: string): Pr
 }
 
 export async function createPlaylist(input: CreatePlaylistInput, token?: string): Promise<Playlist> {
+  const normalizedToken = token?.trim().replace(/^Bearer\s+/i, "") || getStoredToken();
+
+  if (!normalizedToken) {
+    throw new Error("Missing auth token");
+  }
+
   const result = await requestJson("/playlists", {
     method: "POST",
     body: JSON.stringify(input),
-    headers: authorizationHeaders(token),
+    headers: authorizationHeaders(normalizedToken),
   });
 
   if (result && typeof result === "object") return normalizePlaylist(result, 0);
 
-  const playlists = await getPlaylists(token);
+  const playlists = await getPlaylists(normalizedToken);
   const created = [...playlists].reverse().find((playlist) => playlist.name === input.name);
   if (!created) throw new Error("Created playlist could not be resolved");
   return created;
@@ -336,4 +363,31 @@ export async function removeFavorite(trackId: number, token?: string): Promise<v
     method: "DELETE",
     headers: authorizationHeaders(token),
   });
+}
+
+export async function uploadTrack(formData: FormData): Promise<Track> {
+  const response = await fetch(`${API_BASE_URL}/uploads/track`, {
+    method: "POST",
+    body: formData,
+    headers: authorizationHeaders(),
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.text();
+    console.error("SOUL track upload failed", {
+      status: response.status,
+      statusText: response.statusText,
+      responseBody,
+    });
+    let message = responseBody;
+    try {
+      const parsed = JSON.parse(responseBody) as { message?: string; error?: string };
+      message = parsed.message ?? parsed.error ?? "";
+    } catch {
+      // The backend may return a plain-text message.
+    }
+    throw new Error(message || "The track could not be uploaded. Please try again.");
+  }
+
+  return normalizeTrack(await response.json());
 }
